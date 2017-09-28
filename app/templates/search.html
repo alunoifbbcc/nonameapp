@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block page_content %}
+    <div class="page-header">
+        <div class='row'>
+        <div class='col-md-6'>
+        <h1>Search</h1>
+        <p>
+        {{ wtf.quick_form(form) }}
+        </p>
+        </div>
+    </div>
+    </div>
+    {% if topics %}
+    {% for topic in topics %}
+        <div class='row'>
+            <div class = 'col-md-6'>
+                <a href="{{ url_for('main.topic', name = topic.name ) }}"><b>{{ topic.name }}</b></a>
+                <p>
+                    {{ topic.description }}
+                </p>
+            </div>
+        </div>
+    {% endfor %}
+    {% else %}
+        <div class='row'>
+            <div class = 'col-md-6'>
+                <h1>Nothing was found</h1>
+                <p>
+                Do you wanna create this topic? <a href='{{ url_for('main.createtopic') }}'>Click Here</a>
+                </p>
+           </div>
+        </div>
+    {% endif %}
+{% endblock %}

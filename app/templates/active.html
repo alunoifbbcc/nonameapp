@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+    <div class='page-header'>
+        <h2>Active Topics Today</h2>
+    </div>
+    {% for topic in topics %}
+    <div class='row'>
+        <div class = 'col-md-6'>
+            <a href="{{ url_for('main.topic', name = topic['name'] ) }}"><b>{{ topic['name'] }}</b></a>
+            <p>
+                {{ topic['description'] }}
+            </p>
+        </div>
+    </div>
+    {% endfor %}
+{% endblock %}

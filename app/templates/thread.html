@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block page_content %}
+    <div class="page-header">
+        <b>Author:</b> {{ thread.author.username }}</br>
+        <h2>{{ thread.title }}</h2>
+        <p>
+            {{ thread.body }}
+        </p>
+        </br>
+        <div class="row">
+            <div class="col-md-6">
+                {{ wtf.quick_form(form) }}
+            </div>
+        </div>
+    </div>
+    {% for comment in comments %}
+    <div class='row'>
+        <div class = 'col-md-6'>
+            <b>Author:</b> {{ comment.author.username }}
+            <p>
+                {{ comment.body }}
+            </p>
+        </div>
+    </div>
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+    <div class="page-header">
+        <h1>{{ topic.name }}</h1>
+        </p>
+            {{ topic.description }}
+        </p>
+        </br>
+            {% if not current_user.is_subscribed(topic) %}
+                <a href="{{ url_for('main.subscribe', id = topic.id) }}"
+                class="btn btn-primary">Subscribe</a>
+            {% else %}
+                <a href="{{ url_for('main.unsubscribe', id = topic.id) }}"
+                class="btn btn-default">Unsubscribe</a>
+            {% endif %}
+            <a href="{{ url_for('main.createthread', id = topic.id) }}"
+                class="btn btn-secondary">Add Thread</a>
+    </div>
+    {% for thread in threads %}
+    <div class='row'>
+        <div class = 'col-md-6'>
+            <a href="{{ url_for('main.thread', id = thread.id ) }}"><b>{{ thread.title }}</b></a>
+            <p>
+                {{ thread.body }}
+            </p>
+        </div>
+    </div>
+    {% endfor %}
+{% endblock %}

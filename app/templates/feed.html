@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+    <div class="page-header">
+        <h1>Feed</h1>
+    </div>
+    {% for thread in threads %}
+        <div class="row">
+            <div class="col-md-6">
+                <b>Topic: <a href="{{ url_for('main.topic', name = thread.topic.name) }}">{{ thread.topic.name }}</a></b></br>
+                <a href="{{ url_for('main.thread', id = thread.id) }}">{{ thread.title }}</a>
+                </br>
+                {{ thread.body }}
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
