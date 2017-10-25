@@ -15,7 +15,7 @@ def index():
 
 @main.route('/active')
 def active():
-    topics = db.engine.execute('SELECT * from topic_active_today').fetchall()
+    topics = Topic.query.filter(Topic.last_update > (datetime.now() - timedelta(days=1)));
     return render_template('active.html', topics = topics)
 
 @main.route('/search', methods = ['GET', 'POST'])
