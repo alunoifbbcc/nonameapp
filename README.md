@@ -1,10 +1,10 @@
-DB2 class project
+Programming Paradigms class project
 
 #### HOW TO USE:
 
 ##### Clone the application and create a virtual enviroment:
 ```
-git clone https://github.com/AmonartRolon/noname-app.git
+git clone https://github.com/alunoifbbcc/nonameapp.git
 cd noname-app
 python3 -m venv venv
 ```
