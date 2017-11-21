@@ -2,10 +2,11 @@ from app import db, login_manager
 from werkzeug.security import generate_password_hash, \
         check_password_hash
 from flask_login import UserMixin, AnonymousUserMixin
-from flask import current_app
+from flask import current_app, url_for
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from datetime import datetime
 from sqlalchemy import event, DDL
+from .exceptions import ValidationError
 
 class Permission:
     FOLLOW = 0x01
@@ -144,6 +145,19 @@ class User(UserMixin, db.Model):
             return None
         return User.query.get(data['id'])
 
+    def to_json(self):
+        json_user = {
+                'id' : self.id,
+                'uri' : url_for('api.get_user', id=self.id, _external=True),
+                'username' : self.username,
+                'last_seen' : self.last_seen,
+                'member_since': self.member_since,
+                'subscriptions' : url_for('api.get_user_subscriptions', id=self.id, _external=True),
+                'topics' : url_for('api.get_user_topics', id=self.id, _external=True),
+                'threads' : url_for('api.get_user_threads', id=self.id, _external=True)
+        }
+        return json_user
+
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         if self.role is None:
@@ -165,6 +179,30 @@ class Topic(db.Model):
 
     threads = db.relationship('Thread', backref='topic', lazy = 'dynamic')
 
+    @staticmethod
+    def from_json(json_topic):
+        description = json_topic.get('description')
+        if description is None or description == '':
+            raise ValidationError('topic does not have a description')
+
+        name = json_topic.get('name')
+        if name is None or name == '':
+            raise ValidationError('topic does not have a name')
+
+        return Topic(name = name, description = description)
+
+    def to_json(self):
+        json_topic = {
+                'id' : self.id,
+                'uri' : url_for('api.get_topic', id=self.id, _external=True),
+                'name' : self.name,
+                'description' : self.description,
+                'last_update' : self.last_update,
+                'creator' : url_for('api.get_user', id=self.id, _external=True)
+        }
+
+        return json_topic
+
     def __repr__(self):
         return '<Topic %r>' % self.name
 
@@ -181,6 +219,31 @@ class Thread(db.Model):
 
     comments = db.relationship('Comment', backref='thread', lazy = 'dynamic')
 
+    @staticmethod
+    def from_json(json_thread):
+        body = json_thread.get('body')
+        if body is None or body == '':
+            raise ValidationError('thread does not have a body')
+
+        title = json_thread.get('title')
+        if title is None or title == '':
+            raise ValidationError('thread does not have a title')
+
+        return Thread(title = title, body = body)
+
+    def to_json(self):
+        json_thread = {
+                'id' : self.id,
+                'uri' : url_for('api.get_thread', id = self.id, _external = True),
+                'title' : self.title,
+                'body' : self.body,
+                'last_modified' : self.last_modified,
+                'creation_date' : self.creation_date,
+                'author' : url_for('api.get_user', id=self.author_id, _external = True),
+                'topic' : url_for('api.get_topic', id=self.topic_id, _external = True)
+        }
+        return json_thread
+
     def __repr__(self):
         return '<Topic %r>' % self.title
 
@@ -192,6 +255,24 @@ class Comment(db.Model):
 
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     thread_id = db.Column(db.Integer, db.ForeignKey('threads.id'))
+
+    @staticmethod
+    def from_json(json_comment):
+        body = json_comment.get('body')
+        if body is None or body == '':
+            raise ValidationError('comment does not have a body')
+        return Comment(body = body)
+
+    def to_json(self):
+        json_comment = {
+                'id': self.id,
+                'thread' : url_for('api.get_thread', id=self.thread_id, _external=True),
+                'uri' : url_for('api.get_comment', id=self.id, _external = True),
+                'body' : self.body,
+                'timestamp' : self.timestamp,
+                'author' : url_for('api.get_user', id=self.author_id, _external = True)
+        }
+        return json_comment
 
     def __repr__(self):
         return '<Post %r>' % self.body
