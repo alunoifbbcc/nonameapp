@@ -20,17 +20,20 @@ class DevelopmentConfig(Config):
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    db_path = os.path.join(basedir, 'data-dev.sqlite')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
-            'postgres://postgres:postgres@localhost:5432/noname-dev'
+            'sqlite:///' + db_path
 
 class TestingConfig(Config):
     TESTING = True
+    db_path = os.path.join(basedir, 'data-test.sqlite')
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
-            'postgres://postgres:postgres@localhost:5432/noname-test'
+            'sqlite:///' + db_path
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
-            'postgres://postgres:postgres@localhost:5432/noname'
+    db_path = os.path.join(basedir, 'data.sqlite')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('PRODUCTION_DATABASE_URL') or \
+            'sqlite:///' + db_path
 
 config = {
         'development' : DevelopmentConfig,
