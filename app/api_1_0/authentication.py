@@ -6,7 +6,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as JWT
 from .errors import bad_request, unauthorized
 from flask_httpauth import HTTPTokenAuth
 
-auth = HTTPTokenAuth(scheme = 'Bearer')
+auth  = HTTPTokenAuth(scheme = 'Bearer')
 
 @auth.verify_token
 def verify_token(token):
@@ -18,6 +18,7 @@ def verify_token(token):
         return False
     if 'id' in data:
         g.current_user = User.query.get(data['id'])
+        print(g.current_user)
         if g.current_user is not None:
             return True
     return False
@@ -39,5 +40,6 @@ def login():
     if user.verify_password(password):
         g.current_user = user
         token = g.current_user.generate_auth_token(expiration=3600).decode('ascii')
-        return jsonify({'token': token, 'expiration': 3600}), 200
+        print(token)
+        return jsonify({'token': token, 'expiration': 3600, 'id' : g.current_user.id}), 200
     return bad_request('Invalid credentials')
